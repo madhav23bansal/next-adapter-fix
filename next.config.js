@@ -1,7 +1,9 @@
+const path = require('path');
 const withPlugins = require('next-compose-plugins');
 const withTM = require('next-transpile-modules')([
   'native-base',
   'react-native-svg',
+  'react-native-vector-icons-for-web',
   'react-native-web',
   'react-native-safe-area-context',
   '@react-aria/visually-hidden',
@@ -26,11 +28,20 @@ module.exports = withPlugins(
     // your plugins go here.
   ],
   {
-    webpack: (config) => {
+    webpack: (config, options) => {
+      config.module.rules.push({
+        test: /\.ttf$/,
+        loader: "url-loader", // or directly file-loader
+        include: path.resolve(
+          __dirname,
+          "node_modules/react-native-vector-icons"
+        ),
+      })
       config.resolve.alias = {
         ...(config.resolve.alias || {}),
         // Transform all direct `react-native` imports to `react-native-web`
         'react-native$': 'react-native-web',
+        "@expo/vector-icons": "react-native-vector-icons-for-web",
       };
       config.resolve.extensions = [
         '.web.js',
